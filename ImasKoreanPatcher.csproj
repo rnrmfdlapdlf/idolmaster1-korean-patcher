@@ -43,7 +43,16 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="MainForm.cs" />
+    <Compile Include="AlphaBitmap.cs" />
+    <Compile Include="Bc3Dxt3Codec.cs" />
+    <Compile Include="BnaArchive.cs" />
+    <Compile Include="FontPatchRunner.cs" />
+    <Compile Include="GlyphAlphaRenderer.cs" />
+    <Compile Include="HangulFontRemap.cs" />
+    <Compile Include="HangulRemapper.cs" />
     <Compile Include="JsonTranslationStore.cs" />
+    <Compile Include="NfhFont.cs" />
+    <Compile Include="NutTexture.cs" />
     <Compile Include="TranslationPatchResult.cs" />
     <Compile Include="XboxTextPatcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

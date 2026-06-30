@@ -14,10 +14,12 @@ namespace ImasKoreanPatcher
         private const int MsgTableOffset = 0x30;
 
         private readonly Dictionary<string, string> translations;
+        private readonly HangulRemapper remapper;
 
-        public XboxTextPatcher(Dictionary<string, string> translations)
+        public XboxTextPatcher(Dictionary<string, string> translations, HangulRemapper remapper)
         {
             this.translations = translations;
+            this.remapper = remapper;
         }
 
         public TranslationPatchResult PatchExtractedRoot(string extractedRoot, Action<int, string> progress)
@@ -172,7 +174,7 @@ namespace ImasKoreanPatcher
                 string koText;
                 if (translations.TryGetValue(textId, out koText))
                 {
-                    texts.Add(koText);
+                    texts.Add(remapper.Apply(koText));
                     result.MsgEntriesPatched++;
                     changed = true;
                 }
