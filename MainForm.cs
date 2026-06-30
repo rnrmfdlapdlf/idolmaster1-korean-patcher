@@ -302,6 +302,12 @@ namespace ImasKoreanPatcher
                 throw new FileNotFoundException("\ubc88\uc5ed \ub370\uc774\ud130\ub97c \ucc3e\uc744 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.", translationsPath);
             }
 
+            string defaultXexTranslationsPath = Path.Combine(assetRoot, "default_xex_text_id_ko.jsonl");
+            if (!File.Exists(defaultXexTranslationsPath))
+            {
+                throw new FileNotFoundException("default.xex \ubc88\uc5ed \ub370\uc774\ud130\ub97c \ucc3e\uc744 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.", defaultXexTranslationsPath);
+            }
+
             string remapPath = Path.Combine(assetRoot, Path.Combine("Remap", "xbox_hangul_remap.json"));
             if (!File.Exists(remapPath))
             {
@@ -334,8 +340,10 @@ namespace ImasKoreanPatcher
 
             Report(worker, 32, "\ubc88\uc5ed/remap \ub370\uc774\ud130 \ub85c\ub4dc \uc911...");
             var translations = JsonTranslationStore.Load(translationsPath);
+            var defaultXexTranslations = JsonTranslationStore.Load(defaultXexTranslationsPath);
             HangulRemapper remapper = HangulRemapper.Load(remapPath);
             remapper.ValidateAll(translations.Values);
+            remapper.ValidateAll(defaultXexTranslations.Values);
             XboxTextPatcher textPatcher = new XboxTextPatcher(translations, remapper);
 
             Report(worker, 35, "\ud574\uc81c\ub41c \ud30c\uc77c\uc5d0 \ubc88\uc5ed \ubc18\uc601 \uc911...");
@@ -351,6 +359,16 @@ namespace ImasKoreanPatcher
                 throw new InvalidOperationException("\ubc18\uc601\ub41c \ubc88\uc5ed \ubb38\uc790\uc5f4\uc774 0\uac1c\uc785\ub2c8\ub2e4.");
             }
 
+            XexTextPatcher xexPatcher = new XexTextPatcher(defaultXexTranslations, remapper);
+            XexPatchResult xexResult = xexPatcher.PatchExtractedRoot(
+                extractRoot,
+                assetRoot,
+                workRoot,
+                delegate(int percent, string message)
+                {
+                    Report(worker, percent, message);
+                });
+
             FontPatchRunner.PatchExtractedRoot(
                 extractRoot,
                 assetRoot,
@@ -360,7 +378,7 @@ namespace ImasKoreanPatcher
                     Report(worker, percent, message);
                 });
 
-            Report(worker, 82, "\ubc88\uc5ed\ub41c \ud30c\uc77c\ub85c ISO \uc7ac\uc0dd\uc131 \uc911...");
+            Report(worker, 88, "\ubc88\uc5ed\ub41c \ud30c\uc77c\ub85c ISO \uc7ac\uc0dd\uc131 \uc911...");
             RunTool(
                 exisoPath,
                 "-c " + QuoteArgument(extractRoot) + " " + QuoteArgument(outputIso),
@@ -380,7 +398,7 @@ namespace ImasKoreanPatcher
             Report(
                 worker,
                 100,
-                String.Format("\uc644\ub8cc: {0:N0}\uac1c \ubb38\uc790\uc5f4 \ubc18\uc601, {1}", patchResult.MsgEntriesPatched, outputIso));
+                String.Format("\uc644\ub8cc: BNA {0:N0}\uac1c, XEX {1:N0}\uac1c \ubb38\uc790\uc5f4 \ubc18\uc601, {2}", patchResult.MsgEntriesPatched, xexResult.StringsPatched, outputIso));
         }
 
         private static string FindAssetsRoot(string preferredPath)

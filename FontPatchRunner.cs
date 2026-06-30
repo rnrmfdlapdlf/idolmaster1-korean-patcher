@@ -23,19 +23,19 @@ namespace ImasKoreanPatcher
             RequireFile(remapPath, "xbox_hangul_remap.json");
             RequireFile(fontPath, "title_Medium.ttf");
 
-            Report(progress, 66, "\ud3f0\ud2b8 \ud328\uce58 \uc900\ube44 \uc911...");
+            Report(progress, 73, "\ud3f0\ud2b8 \ud328\uce58 \uc900\ube44 \uc911...");
             BnaArchive initialTemp = BnaArchive.Load(initialTempBna);
             BnaArchive initialFix = BnaArchive.Load(initialFixBna);
             byte[] nutData = initialTemp.ReadEntry("root/font/font27.nut");
             byte[] nfhData = initialFix.ReadEntry("root/initialFix/font27.nfh");
 
-            Report(progress, 70, "\ud55c\uae00 \uae00\ub9ac\ud504 \ub80c\ub354\ub9c1 \uc911...");
+            Report(progress, 76, "\ud55c\uae00 \uae00\ub9ac\ud504 \ub80c\ub354\ub9c1 \uc911...");
             byte[] patchedNut = PatchFontNut(nutData, nfhData, remapPath, fontPath);
 
-            Report(progress, 78, "\ud328\uce58\ub41c \ud3f0\ud2b8\ub97c BNA\uc5d0 \uc801\uc6a9 \uc911...");
+            Report(progress, 84, "\ud328\uce58\ub41c \ud3f0\ud2b8\ub97c BNA\uc5d0 \uc801\uc6a9 \uc911...");
             initialTemp.ReplaceEntry("root/font/font27.nut", patchedNut);
             initialTemp.Save(initialTempBna);
-            Report(progress, 80, "\ud3f0\ud2b8 \ud328\uce58 \uc644\ub8cc");
+            Report(progress, 86, "\ud3f0\ud2b8 \ud328\uce58 \uc644\ub8cc");
         }
 
         private static byte[] PatchFontNut(byte[] nutBytes, byte[] nfhBytes, string remapPath, string fontPath)
