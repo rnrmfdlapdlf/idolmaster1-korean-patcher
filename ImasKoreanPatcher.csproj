@@ -43,6 +43,9 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="MainForm.cs" />
+    <Compile Include="JsonTranslationStore.cs" />
+    <Compile Include="TranslationPatchResult.cs" />
+    <Compile Include="XboxTextPatcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

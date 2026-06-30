@@ -289,10 +289,17 @@ namespace ImasKoreanPatcher
             }
 
             string assetRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets");
+            assetRoot = FindAssetsRoot(assetRoot);
             string exisoPath = Path.Combine(assetRoot, Path.Combine("Tools", "exiso.exe"));
             if (!File.Exists(exisoPath))
             {
                 throw new FileNotFoundException("exiso.exe\ub97c \ucc3e\uc744 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.", exisoPath);
+            }
+
+            string translationsPath = Path.Combine(assetRoot, "translations_text_id_ko.jsonl");
+            if (!File.Exists(translationsPath))
+            {
+                throw new FileNotFoundException("\ubc88\uc5ed \ub370\uc774\ud130\ub97c \ucc3e\uc744 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.", translationsPath);
             }
 
             string isoDirectory = Path.GetDirectoryName(isoPath);
@@ -319,7 +326,23 @@ namespace ImasKoreanPatcher
                 throw new InvalidOperationException("ISO \ud574\uc81c \uacb0\uacfc\uac00 \ube44\uc5b4 \uc788\uc2b5\ub2c8\ub2e4.");
             }
 
-            Report(worker, 70, "\ud574\uc81c\ub41c \ud30c\uc77c\ub85c ISO \uc7ac\uc0dd\uc131 \uc911...");
+            Report(worker, 32, "\ubc88\uc5ed \ub370\uc774\ud130 \ub85c\ub4dc \uc911...");
+            XboxTextPatcher textPatcher = new XboxTextPatcher(JsonTranslationStore.Load(translationsPath));
+
+            Report(worker, 35, "\ud574\uc81c\ub41c \ud30c\uc77c\uc5d0 \ubc88\uc5ed \ubc18\uc601 \uc911...");
+            TranslationPatchResult patchResult = textPatcher.PatchExtractedRoot(
+                extractRoot,
+                delegate(int percent, string message)
+                {
+                    Report(worker, percent, message);
+                });
+
+            if (patchResult.MsgEntriesPatched == 0)
+            {
+                throw new InvalidOperationException("\ubc18\uc601\ub41c \ubc88\uc5ed \ubb38\uc790\uc5f4\uc774 0\uac1c\uc785\ub2c8\ub2e4.");
+            }
+
+            Report(worker, 70, "\ubc88\uc5ed\ub41c \ud30c\uc77c\ub85c ISO \uc7ac\uc0dd\uc131 \uc911...");
             RunTool(
                 exisoPath,
                 "-c " + QuoteArgument(extractRoot) + " " + QuoteArgument(outputIso),
@@ -339,7 +362,29 @@ namespace ImasKoreanPatcher
             Report(
                 worker,
                 100,
-                "\uc7ac\uc0dd\uc131 \uc644\ub8cc: " + outputIso);
+                String.Format("\uc644\ub8cc: {0:N0}\uac1c \ubb38\uc790\uc5f4 \ubc18\uc601, {1}", patchResult.MsgEntriesPatched, outputIso));
+        }
+
+        private static string FindAssetsRoot(string preferredPath)
+        {
+            if (Directory.Exists(preferredPath))
+            {
+                return preferredPath;
+            }
+
+            DirectoryInfo directory = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            while (directory != null)
+            {
+                string candidate = Path.Combine(directory.FullName, "Assets");
+                if (Directory.Exists(candidate))
+                {
+                    return candidate;
+                }
+
+                directory = directory.Parent;
+            }
+
+            return preferredPath;
         }
 
         private static string GetAvailableDirectoryPath(string desiredPath)
