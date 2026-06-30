@@ -1,0 +1,13 @@
+bin/
+obj/
+.vs/
+Assets/
+AGENTS.md
+README.md
+THIRD_PARTY_NOTICES.txt
+*.user
+*.suo
+*.cache
+*.pdb
+*.nupkg
+*.zip
